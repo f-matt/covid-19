@@ -9,3 +9,11 @@ create table notifications (
   deaths int not null default 0,
   unique (code, notification_date)
 );
+
+create table samples (
+  sample_id integer not null,
+  seq integer not null,
+  value integer not null,
+  type char(1) not null check (type in ('T', 'V', 'X')),
+  primary key (sample_id, seq)
+);
