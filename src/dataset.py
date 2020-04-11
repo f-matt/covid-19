@@ -4,7 +4,7 @@ import psycopg2
 import numpy as np
 
 
-def create_dataset(input_size):
+def create_dataset(experiment_id, input_size):
     try:
         conn = psycopg2.connect("dbname='covid19' user='postgres' host='localhost' password='123456'")
         cur = conn.cursor()
@@ -13,6 +13,7 @@ def create_dataset(input_size):
         cur.execute("""select code
             from notifications
             where cases > 100
+            and code <> 'OWID_WRL'
             group by code
             having count(*) > %s""", (input_size,))
         codes = cur.fetchall()
@@ -35,41 +36,42 @@ def create_dataset(input_size):
 
             for i in range(len(cases) - sample_size + 1):
                 slice = cases[i:i+sample_size]
-
-                # Target
-                samples.append({"sample_id": sample_id,
-                    "seq": 1,
-                    "value": slice[-1],
-                    "type": None})
-
-                seq = 2
-                for j in range(input_size):
-                    samples.append({"sample_id": sample_id,
-                    "seq": seq + j,
-                    "value": slice[j],
-                    "type": None})
-
-                sample_id += 1
+                samples.append(slice)
 
         np.random.shuffle(samples)
 
         n_val_samples = int(round(0.1 * len(samples)))
 
+        db_samples = list()
+
         for i in range(len(samples)):
             # First n_val_samples used for test
             if i < n_val_samples:
-                samples[i]["type"] = "X"
+                type = "X"
             elif i < (2 * n_val_samples):
-                samples[i]["type"] = "V"
+                type = "V"
             else:
-                samples[i]["type"] = "T"
+                type = "T"
 
-            cur.execute("""insert into samples(sample_id, seq, value, type)
-                values (%s, %s, %s, %s)""", (samples[i]["sample_id"],
-                    samples[i]["seq"],
-                    samples[i]["value"],
-                    samples[i]["type"]));
+            # Target
+            cur.execute("""insert into samples(experiment_id, sample_id, seq, value, type)
+                values (%s, %s, %s, %s, %s)""",(experiment_id,
+                    i + 1,
+                    1,
+                    samples[i][-1],
+                    type));
+
+            seq = 2
+            for j in range(input_size):
+                cur.execute("""insert into samples(experiment_id, sample_id, seq, value, type)
+                    values (%s, %s, %s, %s, %s)""",(experiment_id,
+                        i + 1,
+                        seq + j,
+                        samples[i][j],
+                        type));
+
         conn.commit()
+
     except Exception as e:
         print "Exception reached: " , e
         return None
@@ -81,4 +83,4 @@ def create_dataset(input_size):
 
 
 if __name__ == "__main__":
-    create_dataset(2)
+    create_dataset(experiment_id=2, input_size=4)

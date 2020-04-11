@@ -11,9 +11,10 @@ create table notifications (
 );
 
 create table samples (
+  experiment_id integer not null,
   sample_id integer not null,
   seq integer not null,
   value integer not null,
   type char(1) not null check (type in ('T', 'V', 'X')),
-  primary key (sample_id, seq)
+  primary key (experiment_id, sample_id, seq)
 );
