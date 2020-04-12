@@ -125,6 +125,29 @@ def plot_2_codes(label, code1, code2):
 
 
 
+def plot_predictions():
+    ground_truth = [121, 200, 234, 291, 428, 621, 904, 1128, 1546, 1891, 2201, 2433, 2915, 3417, 3904, 4256, 4579, 5717, 6836, 7910, 9056, 10278, 11130, 12056, 13717, 15927, 17857, 19638, 20727];
+    #predicted = [121, 200, 234, 291, 428, 621, 904, 1128, 1546, 1891, 2201, 2433, 2915, 3417, 3904, 4256, 4579, 5717, 6836, 7910, 9056, 10278, 11130, 12056, 13717, 15328, 17029, 18941, 21023, 23413]
+    x_pred = [25, 26, 27, 28, 29]
+    predicted = [15328, 17029, 18941, 21023, 23413]
+
+
+    y_min = np.array(predicted) * 0.9
+    y_max = np.array(predicted) * 1.1
+
+    fig, ax = plt.subplots()
+    ax.plot(ground_truth, 'o-', label='Ground truth')
+    ax.plot(x_pred, predicted, 'x-', label='Predicted')
+    ax.fill_between(x_pred, y_min, y_max, alpha=0.2)
+    ax.set(xlabel='Days after 100th notification', title='Covid19 - Predicted cases')
+    ax.grid()
+    ax.legend()
+
+    plt.show()
+    
+
+
 if __name__ == "__main__":
 
-    plot_2_codes("cases", "USA", "CHN")
+    # plot_2_codes("cases", "USA", "CHN")
+    plot_predictions()

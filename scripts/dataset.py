@@ -83,4 +83,4 @@ def create_dataset(experiment_id, input_size):
 
 
 if __name__ == "__main__":
-    create_dataset(experiment_id=2, input_size=4)
+    create_dataset(experiment_id=3, input_size=8)

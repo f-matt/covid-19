@@ -12,7 +12,7 @@
 class Net : public torch::nn::Module {
 
 public:
-	Net(unsigned input_size, unsigned output_size);
+	Net(unsigned input_size, unsigned output_size, unsigned n_hidden_layers, unsigned neurons);
 
 	virtual ~Net();
 
@@ -20,11 +20,7 @@ public:
 
 
 private:
-	torch::nn::Linear fc1{nullptr};
-	torch::nn::Linear fc2{nullptr};
-	torch::nn::Linear fc3{nullptr};
-	torch::nn::Linear fc4{nullptr};
-	torch::nn::Linear fc5{nullptr};
+	std::vector<torch::nn::Linear> hidden_layers;
 
 	torch::nn::Linear output{nullptr};
 

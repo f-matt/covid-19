@@ -8,18 +8,22 @@
 #include "Net.h"
 
 using namespace torch;
+using namespace std;
 
-constexpr unsigned neurons = 64;
 
-Net::Net(unsigned input_size, unsigned output_size) {
+Net::Net(unsigned input_size, unsigned output_size, unsigned n_hidden_layers, unsigned neurons) {
 
-	fc1 = register_module("fc1", nn::Linear(input_size, neurons));
-	fc2 = register_module("fc2", nn::Linear(neurons, neurons));
-	fc3 = register_module("fc3", nn::Linear(neurons, neurons));
-	fc4 = register_module("fc4", nn::Linear(neurons, neurons));
-	fc5 = register_module("fc5", nn::Linear(neurons, neurons));
+	unsigned last_layer_output = input_size;
 
-	output = register_module("output", nn::Linear(neurons, output_size));
+	for (int i = 0; i < n_hidden_layers; ++i) {
+		stringstream ss;
+		ss << "fc" << (i+1);
+
+		hidden_layers.push_back(register_module(ss.str(), nn::Linear(last_layer_output, neurons)));
+		last_layer_output = neurons;
+	}
+
+	output = register_module("output", nn::Linear(last_layer_output, output_size));
 
 }
 
@@ -32,15 +36,10 @@ Net::~Net() {
 // Forward pass
 Tensor Net::forward(Tensor x) {
 
-	x = relu(fc1->forward(x));
-	x = relu(fc2->forward(x));
-	x = relu(fc3->forward(x));
-	x = relu(fc4->forward(x));
-	x = relu(fc5->forward(x));
+	for (nn::Linear &layer : hidden_layers)
+		x = relu(layer->forward(x));
 
-	x = output->forward(x);
-
-	return x;
+	return output->forward(x);
 
 }
 

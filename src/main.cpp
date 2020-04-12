@@ -13,12 +13,13 @@ using namespace pqxx;
 using namespace covid19;
 
 
-constexpr unsigned experiment_id = 2;
-constexpr unsigned input_size = 4;
+constexpr unsigned experiment_id = 3;
+constexpr unsigned input_size = 8;
+
 constexpr unsigned output_size = 1;
 constexpr unsigned batch_size = 4;
 
-constexpr unsigned max_epochs = 1000;
+constexpr unsigned max_epochs = 10000;
 
 constexpr float normalization = 1e6;
 
@@ -26,13 +27,17 @@ constexpr float learning_rate = 0.001;
 
 constexpr unsigned early_stopping = 50;
 
-const string snapshot_file = "snapshots/3-fcr64-x5.pt";
+constexpr unsigned n_hidden_layers = 2;
+
+constexpr unsigned neurons = 64;
+
+const string snapshot_file = "snapshots/8fcr64x2.pt";
 
 
 void train() {
 
 	// Create net
-	auto net = make_shared<Net>(input_size, output_size);
+	auto net = make_shared<Net>(input_size, output_size, n_hidden_layers, neurons);
 
 	// Dataset
 	auto train_data_set = Dataset(experiment_id, input_size, output_size, "T", normalization).map(data::transforms::Stack<>());
@@ -135,7 +140,7 @@ void train() {
 void test() {
 
 	// Create net
-	auto net = make_shared<Net>(input_size, output_size);
+	auto net = make_shared<Net>(input_size, output_size, n_hidden_layers, neurons);
 
 	load(net, snapshot_file);
 
@@ -189,14 +194,18 @@ void evaluate(string code) {
 				ground_truth.push_back(row["cases"].as<int>());
 
 			vector<int> predicted;
-			auto net = make_shared<Net>(input_size, output_size);
+			auto net = make_shared<Net>(input_size, output_size, n_hidden_layers, neurons);
 
 			load(net, snapshot_file);
 
-			for (int i = 0; i < 5; ++i)
-				predicted.push_back(ground_truth[i]);
+//			for (int i = 0; i < 10; ++i)
+//				predicted.push_back(ground_truth[i]);
 
-			while (predicted.size() < ground_truth.size()) {
+			for (int i= 0; i < ground_truth.size(); ++i) {
+				predicted.push_back(ground_truth[i]);
+			}
+
+			while (predicted.size() < (ground_truth.size() + 5)) {
 
 				vector<float> v_input;
 
@@ -209,8 +218,18 @@ void evaluate(string code) {
 				predicted.push_back(prediction.item<int>());
 			}
 
-			matplotlibcpp::named_plot("Ground truth", ground_truth);
-			matplotlibcpp::named_plot("Prediction", predicted);
+			for (int i = 0; i < ground_truth.size(); ++i)
+				cout << ground_truth[i] << ", ";
+
+			cout << endl;
+
+			for (int i = 0; i < predicted.size(); ++i)
+				cout << predicted[i] << ", ";
+
+			cout << endl;
+
+			matplotlibcpp::named_plot("Ground truth", ground_truth, "o-");
+			matplotlibcpp::named_plot("Prediction", predicted, "x-");
 
 			matplotlibcpp::legend();
 			matplotlibcpp::show();
@@ -236,9 +255,9 @@ int main() {
 
 	// train();
 
-	test();
+	// test();
 
-	// evaluate("BRA");
+	evaluate("BRA");
 
 
 }
