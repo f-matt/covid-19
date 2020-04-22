@@ -41,7 +41,7 @@ namespace covid19 {
 				unsigned last_sample_idx = -1;
 
 				for (auto row : rset) {
-					int sample_idx = row["sample_id"].as<int>() - 1;
+					unsigned sample_idx = row["sample_id"].as<int>() - 1;
 					int seq = row["seq"].as<int>() - 2;
 					float value = row["value"].as<float>() / normalization;
 

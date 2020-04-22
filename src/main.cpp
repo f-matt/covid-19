@@ -26,10 +26,10 @@ const float learning_rate = 0.001;
 const unsigned early_stopping = 50;
 
 const unsigned n_conv_layers = 2;
-const unsigned n_hidden_layers = 4;
+const unsigned n_hidden_layers = 1;
 
 const unsigned n_filters = 32;
-const unsigned n_neurons = 64;
+const unsigned n_neurons = 8;
 
 const string snapshot_file = "snapshots/8fcr64x2.pt";
 
@@ -158,7 +158,7 @@ void test() {
 		float *data  = (float*) batch.data.data_ptr();
 		cout << "Inputs: ";
 
-		for(int i = 0; i < input_size; ++i)
+		for(unsigned i = 0; i < input_size; ++i)
 			cout << data[i] << " ";
 
 		cout << "Ground truth: " << batch.target.item<float>()
@@ -201,7 +201,7 @@ void evaluate(string code) {
 //			for (int i = 0; i < 10; ++i)
 //				predicted.push_back(ground_truth[i]);
 
-			for (int i= 0; i < ground_truth.size(); ++i) {
+			for (unsigned i = 0; i < ground_truth.size(); ++i) {
 				predicted.push_back(ground_truth[i]);
 			}
 
@@ -218,12 +218,12 @@ void evaluate(string code) {
 				predicted.push_back(prediction.item<int>());
 			}
 
-			for (int i = 0; i < ground_truth.size(); ++i)
+			for (unsigned i = 0; i < ground_truth.size(); ++i)
 				cout << ground_truth[i] << ", ";
 
 			cout << endl;
 
-			for (int i = 0; i < predicted.size(); ++i)
+			for (unsigned i = 0; i < predicted.size(); ++i)
 				cout << predicted[i] << ", ";
 
 			cout << endl;

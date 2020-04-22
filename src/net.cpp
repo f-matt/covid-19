@@ -10,7 +10,7 @@ using namespace torch;
 using namespace nn;
 using namespace std;
 
-const unsigned initial_kernel_size = 5;
+const unsigned kernel_size = 3;
 
 
 Net::Net(unsigned input_size,
@@ -22,18 +22,14 @@ Net::Net(unsigned input_size,
 {
 	unsigned last_layer_output = input_size;
 	unsigned last_n_filters = 1;
-	unsigned kernel_size = initial_kernel_size;
 
-	for (int i = 0; i < n_conv_layers; ++i) {
+	for (unsigned i = 0; i < n_conv_layers; ++i) {
 		stringstream ss;
 		ss << "conv" << (i+1);
 
 		conv_layers.push_back(register_module(ss.str(), nn::Conv1d(last_n_filters, n_filters, kernel_size)));
 
 		last_layer_output = last_layer_output - (kernel_size - 1);
-
-		if (kernel_size > 3)
-			kernel_size -= 2;
 
 		last_n_filters = n_filters;
 	}
@@ -43,7 +39,7 @@ Net::Net(unsigned input_size,
 		last_layer_output *= last_n_filters;
 	}
 
-	for (int i = 0; i < n_hidden_layers; ++i) {
+	for (unsigned i = 0; i < n_hidden_layers; ++i) {
 		stringstream ss;
 		ss << "fc" << (i+1);
 
