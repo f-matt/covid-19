@@ -1,35 +1,35 @@
-#include "matplotlibcpp.h"
-#include "Dataset.h"
-#include "Net.h"
-
 #include <torch/torch.h>
 #include <pqxx/pqxx>
-
 #include <iostream>
+
+#include "matplotlibcpp.h"
+#include "dataset.h"
+#include "net.h"
 
 using namespace torch;
 using namespace std;
 using namespace pqxx;
 using namespace covid19;
 
+const unsigned experiment_id = 3;
+const unsigned input_size = 8;
 
-constexpr unsigned experiment_id = 3;
-constexpr unsigned input_size = 8;
+const unsigned output_size = 1;
+const unsigned batch_size = 4;
 
-constexpr unsigned output_size = 1;
-constexpr unsigned batch_size = 4;
+const unsigned max_epochs = 10000;
 
-constexpr unsigned max_epochs = 10000;
+const float normalization = 1e6;
 
-constexpr float normalization = 1e6;
+const float learning_rate = 0.001;
 
-constexpr float learning_rate = 0.001;
+const unsigned early_stopping = 50;
 
-constexpr unsigned early_stopping = 50;
+const unsigned n_conv_layers = 2;
+const unsigned n_hidden_layers = 4;
 
-constexpr unsigned n_hidden_layers = 2;
-
-constexpr unsigned neurons = 64;
+const unsigned n_filters = 32;
+const unsigned n_neurons = 64;
 
 const string snapshot_file = "snapshots/8fcr64x2.pt";
 
@@ -37,7 +37,7 @@ const string snapshot_file = "snapshots/8fcr64x2.pt";
 void train() {
 
 	// Create net
-	auto net = make_shared<Net>(input_size, output_size, n_hidden_layers, neurons);
+	auto net = make_shared<Net>(input_size, output_size, n_conv_layers, n_hidden_layers, n_filters, n_neurons);
 
 	// Dataset
 	auto train_data_set = Dataset(experiment_id, input_size, output_size, "T", normalization).map(data::transforms::Stack<>());
@@ -140,7 +140,7 @@ void train() {
 void test() {
 
 	// Create net
-	auto net = make_shared<Net>(input_size, output_size, n_hidden_layers, neurons);
+	auto net = make_shared<Net>(input_size, output_size, n_conv_layers, n_hidden_layers, n_filters, n_neurons);
 
 	load(net, snapshot_file);
 
@@ -194,7 +194,7 @@ void evaluate(string code) {
 				ground_truth.push_back(row["cases"].as<int>());
 
 			vector<int> predicted;
-			auto net = make_shared<Net>(input_size, output_size, n_hidden_layers, neurons);
+			auto net = make_shared<Net>(input_size, output_size, n_conv_layers, n_hidden_layers, n_filters, n_neurons);
 
 			load(net, snapshot_file);
 
@@ -253,11 +253,11 @@ void evaluate(string code) {
 
 int main() {
 
-	// train();
+	train();
 
 	// test();
 
-	evaluate("BRA");
+	// evaluate("BRA");
 
 
 }

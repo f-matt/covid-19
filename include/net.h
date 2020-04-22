@@ -8,11 +8,17 @@
 #define NET_H_
 
 #include <torch/torch.h>
+#include <sstream>
 
 class Net : public torch::nn::Module {
 
 public:
-	Net(unsigned input_size, unsigned output_size, unsigned n_hidden_layers, unsigned neurons);
+	Net(unsigned input_size,
+			unsigned output_size,
+			unsigned n_conv_layers,
+			unsigned n_hidden_layers,
+			unsigned n_filters,
+			unsigned n_neurons);
 
 	virtual ~Net();
 
@@ -20,6 +26,10 @@ public:
 
 
 private:
+	std::vector<torch::nn::Conv1d> conv_layers;
+
+	torch::nn::Flatten flatten{nullptr};
+
 	std::vector<torch::nn::Linear> hidden_layers;
 
 	torch::nn::Linear output{nullptr};

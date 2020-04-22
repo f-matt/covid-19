@@ -4,7 +4,7 @@
  *  Created on: Apr 10, 2020
  *      Author: fernando
  */
-#include "Dataset.h"
+#include "dataset.h"
 
 using namespace std;
 using namespace torch;

@@ -12,6 +12,6 @@ pkg_check_modules( PQXX REQUIRED libpqxx )
 
 include_directories( include )
 
-add_executable( covid19 src/main.cpp src/Dataset.cpp src/Net.cpp )
+add_executable( covid19 src/main.cpp src/dataset.cpp src/net.cpp )
 
 target_link_libraries( covid19 ${TORCH_LIBRARIES} ${PYTHON_LIBRARIES} ${PQXX_LIBRARIES} )
